@@ -13,6 +13,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${app.cors.allowedOrigins}")
     private String[] allowedOrigins;
 
+    /* This method is used to configure cors */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
