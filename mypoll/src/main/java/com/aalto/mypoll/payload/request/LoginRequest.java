@@ -1,4 +1,4 @@
-package com.aalto.mypoll.payload;
+package com.aalto.mypoll.payload.request;
 
 import javax.validation.constraints.NotBlank;
 

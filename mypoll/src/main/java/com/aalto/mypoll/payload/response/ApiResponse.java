@@ -1,4 +1,4 @@
-package com.aalto.mypoll.payload;
+package com.aalto.mypoll.payload.response;
 
 public class ApiResponse {
     private Boolean success;
