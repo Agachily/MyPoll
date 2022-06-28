@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * This class is used to map the Poll entity to a PollResponse payload, which contains a bunch of
  * information like Poll's creator name, Vote counts of each choice in the Poll, the choice that
- * the currently logged-in user has voted for. These information will be used in front-end client
+ * the currently logged-in user has voted for. This information will be used in front-end client
  * for presentation
  */
 public class ModelMapper {
