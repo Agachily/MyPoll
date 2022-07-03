@@ -1,21 +1,29 @@
-import {Form, Input, Button, Icon, Select, Col, notification} from 'antd';
-import {MAX_CHOICES, POLL_QUESTION_MAX_LENGTH, POLL_CHOICE_MAX_LENGTH} from '../constants';
-import {useState} from "@types/react";
-import PollChoice from "./PollChoice";
-import {createPoll} from "../util/APIUtils";
+import {Form, Input, Button, Select, Col, notification, Row} from 'antd';
+import {MAX_CHOICES, POLL_QUESTION_MAX_LENGTH, POLL_CHOICE_MAX_LENGTH} from '../constants/constant'
+import {useNavigate} from 'react-router-dom'
+import { useState } from 'react'
+import PollChoice from "./PollChoice"
+import {createPoll} from "../util/APIUtils"
+import './NewPoll.css';
+import {PlusCircleOutlined} from "@ant-design/icons"
 
-const Option = Select.Option;
-const FormItem = Form.Item;
+const Option = Select.Option
+const FormItem = Form.Item
 const {TextArea} = Input
 
 const NewPoll = ({handleLogout}) => {
+    const navigate = useNavigate()
+
     const [pollInfo, setPollInfo] = useState({
         question: {},
         choices: [
             /* Initially there are  two choices */
             {text: ''}, {text: ''}
         ],
-        pollLength: {}
+        pollLength: {
+            days: 1,
+            hours: 0
+        }
     })
 
     const addChoice = () => {
@@ -35,8 +43,7 @@ const NewPoll = ({handleLogout}) => {
         })
     }
 
-    const handleSubmit = (event) => {
-        event.preventDefault()
+    const handleSubmit = () => {
         const pollData = {
             question: pollInfo.question.text,
             choices: pollInfo.choices.map(choice => {
@@ -46,7 +53,7 @@ const NewPoll = ({handleLogout}) => {
         }
 
         createPoll(pollData).then(response => {
-            // Todo 跳转到主页
+            navigate('/')
         }).catch(error => {
             if (error.status === 401) {
                 handleLogout('/login', 'error', 'You have been logged out. Please login to create a poll.')
@@ -79,7 +86,7 @@ const NewPoll = ({handleLogout}) => {
     }
 
     const handleQuestionChange = (event) => {
-        const value = event.target.valueOf()
+        const value = event.target.value
         setPollInfo({
             ...pollInfo,
             question: {
@@ -110,7 +117,7 @@ const NewPoll = ({handleLogout}) => {
 
     const handleChoiceChange = (event, index) => {
         const choices = pollInfo.choices.slice()
-        const value = event.target.valueOf()
+        const value = event.target.value
 
         choices[index] = {
             text: value,
@@ -153,7 +160,7 @@ const NewPoll = ({handleLogout}) => {
     const choiceViews = []
     pollInfo.choices.forEach((choice, index) => {
         choiceViews.push(
-            <PollChoice choice={choice} choiceNumber={index} removeChoice={removeChoice}
+            <PollChoice key={index} choice={choice} choiceNumber={index} removeChoice={removeChoice}
                         handleChoiceChange={handleChoiceChange}/>
         )
     })
@@ -162,7 +169,7 @@ const NewPoll = ({handleLogout}) => {
         <div className="new-poll-container">
             <h1 className="page-title">Create Poll</h1>
             <div className="new-poll-content">
-                <Form onSubmit={handleSubmit} className="create-poll-form">
+                <Form onFinish={handleSubmit} className="create-poll-form">
                     <FormItem validateStatus={pollInfo.question.validateStatus} help={pollInfo.question.errorMsg}
                               className="poll-form-row">
                         <TextArea
@@ -176,25 +183,33 @@ const NewPoll = ({handleLogout}) => {
                     {choiceViews}
                     <FormItem className="poll-form-row">
                         <Button type="dashed" onClick={addChoice} disabled={pollInfo.choices.length === MAX_CHOICES}>
-                            <Icon type="plus"/> Add a choice
+                            <PlusCircleOutlined /> Add a choice
                         </Button>
                     </FormItem>
                     <FormItem className="poll-form-row">
-                        <Col xs={24} sm={4}>Poll Length</Col>
+                        <Row>
+                        <Col xs={24} sm={4} style={{marginTop: "5px"}}>Valid Time:</Col>
                         <Col xs={24} sm={20}>
                             <span style={{marginRight: '18px'}}>
-                                <Select name="days" defaultValue="1" onChange={handlePollDaysChange}
-                                        value={pollInfo.pollLength.days} styple={{width: 60}}>
+                                <Select name="days"
+                                        defaultValue="1"
+                                        onChange={handlePollDaysChange}
+                                        value={pollInfo.pollLength.days}
+                                        style={{width: 60}}>
                                     {Array.from(Array(8).keys()).map(i => <Option key={i}>{i}</Option>)}
-                                </Select>Days
+                                </Select> &nbsp;Days
                             </span>
                             <span>
-                                <Select name="hours" defaultValue="0" onChange={handlePollHoursChange}
-                                        value={pollInfo.pollLength.hours} styple={{width: 60}}>
+                                <Select name="hours"
+                                        defaultValue="0"
+                                        onChange={handlePollHoursChange}
+                                        value={pollInfo.pollLength.hours}
+                                        style={{width: 60}}>
                                     {Array.from(Array(24).keys()).map(i => <Option key={i}>{i}</Option>)}
-                                </Select>Days
+                                </Select> &nbsp;Hours
                             </span>
                         </Col>
+                        </Row>
                     </FormItem>
                     <FormItem className="poll-form-row">
                         <Button type="primary" htmlType="submit" size="large" disabled={isFormInvalid()}

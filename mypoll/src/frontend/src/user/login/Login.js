@@ -1,38 +1,33 @@
-import {Form, Input, Button, Icon, notification} from 'antd';
-import {useState} from "@types/react";
+import {Form, Input, Button, notification} from 'antd';
+import { useState } from 'react'
 import {login} from "../../util/APIUtils";
 import {ACCESS_TOKEN} from "../../constants/constant";
+import {LockOutlined, UserOutlined} from "@ant-design/icons";
+import './Login.css';
+import {Link} from "react-router-dom";
 
 const FormItem = Form.Item;
 
-const Login = () => {
+const Login = ({handleLogin}) => {
     const [userInfo, setUserInfo] = useState({
         usernameOrEmail: {},
         password: {}
     })
 
-    const handleSubmit = (event) => {
-        event.preventDefault()
-
+    const handleSubmit = () => {
         const loginRequest = {
-            usernameOrEmail: userInfo.usernameOrEmail.value,
-            password: userInfo.password.value
+            usernameOrEmail: userInfo.usernameOrEmail,
+            password: userInfo.password
         }
 
         login(loginRequest).then(response => {
-            localStorage.setItem(ACCESS_TOKEN, response.accessToken)
-            notification.success({
-                message: 'Successful Login',
-                description: 'You can view your personal profile or vote now'
-            })
-            // Todo 加载当前用户
-            // Todo 使用Redux在组件中共享用户状态
-            // Todo 跳转到主页
+            localStorage.setItem(ACCESS_TOKEN, response.data.accessToken)
+            handleLogin()
         }).catch(error => {
-            if (error.status === 401) {
+            if (error.response.status && error.response.status === 401) {
                 notification.error({
                     message: 'Polling App',
-                    description: 'Your Username or Password'
+                    description: 'Invalid credentials'
                 })
             } else {
                 notification.error({
@@ -54,33 +49,39 @@ const Login = () => {
         })
     }
 
-    // Todo 添加样式
     return (
-        <Form onSubmit={handleSubmit}>
-            <FormItem>
-                <Input prefix={<Icon type="user"/>}
-                       size="large"
-                       name='usernameOrEmail'
-                       palceholder="Username or Email"
-                       value={userInfo.usernameOrEmail.value}
-                       onChange={handleInputChange}/>
-            </FormItem>
-            <FormItem>
-                <Input prefix={<Icon type="lock"/>}
-                       size="large"
-                       name='password'
-                       type='password'
-                       palceholder="Password"
-                       value={userInfo.password.value}
-                       onChange={handleInputChange}/>
-            </FormItem>
-            <FormItem>
-                <Button type="primary" htmlType="submit" size="large" className="login-form-button">
-                    Login
-                </Button>
-                {/*Todo 添加跳转到注册的链接*/}
-            </FormItem>
-        </Form>
+        <div className="login-container">
+            <h1 className="page-title">Login</h1>
+            <div className="signup-content">
+                <Form onFinish={handleSubmit} layout='vertical' className="signup-form">
+                    <FormItem>
+                        <Input prefix={<UserOutlined />}
+                               size="large"
+                               name='usernameOrEmail'
+                               palceholder="Username or Email"
+                               value={userInfo.usernameOrEmail.value}
+                               onChange={handleInputChange}/>
+                    </FormItem>
+                    <FormItem>
+                        <Input prefix={<LockOutlined />}
+                               size="large"
+                               name='password'
+                               type='password'
+                               palceholder="Password"
+                               value={userInfo.password.value}
+                               onChange={handleInputChange}/>
+                    </FormItem>
+                    <FormItem>
+                        <Button type="primary"
+                                htmlType="submit"
+                                size="large"
+                                className="signup-form-button">Login</Button>
+                        Or
+                        <Link to="/signup"> register now!</Link>
+                    </FormItem>
+                </Form>
+            </div>
+        </div>
     )
 }
 

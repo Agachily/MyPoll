@@ -6,7 +6,8 @@
 
 .signup-form-button {
     width: 100%;
-    margin-top: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .signup-form-button[disabled], .signup-form-button[disabled]:hover, .signup-form-button[disabled]:focus {
