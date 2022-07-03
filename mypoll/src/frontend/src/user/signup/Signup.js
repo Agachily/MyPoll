@@ -1,5 +1,5 @@
 import {Form, Input, Button, notification} from 'antd';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './Signup.css';
 import {useState} from "react";
 import {
@@ -9,15 +9,17 @@ import {
     PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH
 } from '../../constants/constant';
 import {checkEmailAvailability, checkUsernameAvailability, signup} from "../../util/APIUtils";
+import {LockOutlined, MailOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 
 const FormItem = Form.Item
 
 const Signup = () => {
+    const navigate = useNavigate()
     const [userInfo, setUserInfo] = useState({
-        name: {},
-        username: {},
-        email: {},
-        password: {}
+        name: {value: ''},
+        username: {value: ''},
+        email: {value: ''},
+        password: {value: ''}
     })
 
     const handleInputChange = (event, validationFun) => {
@@ -35,12 +37,10 @@ const Signup = () => {
     }
 
     const handleSubmit = (event) => {
-        event.preventDefault()
-
         const signupRequest = {
             name: userInfo.name.value,
+            username: userInfo.username.value,
             email: userInfo.email.value,
-            username: userInfo.email.value,
             password: userInfo.password.value
         }
 
@@ -49,7 +49,7 @@ const Signup = () => {
                 message: 'Polling App',
                 description: "Thanks! You're successfully registered. Please Login to continue!"
             })
-            // this.props.history.push("/login")
+            navigate('/login')
         }).catch(error => {
             notification.error({
                 message: 'Polling App',
@@ -176,7 +176,7 @@ const Signup = () => {
         }
 
         return {
-            validateStatus: null,
+            validateStatus: 'success',
             errorMsg: null
         }
     }
@@ -209,7 +209,7 @@ const Signup = () => {
             if (response.data.available) {
                 setUserInfo({
                     ...userInfo,
-                    username: {
+                    email: {
                         value: emailValue,
                         validateStatus: 'success',
                         errorMsg: null
@@ -218,7 +218,7 @@ const Signup = () => {
             } else {
                 setUserInfo({
                     ...userInfo,
-                    username: {
+                    email: {
                         value: emailValue,
                         validateStatus: 'error',
                         errorMsg: 'This Email is already registered'
@@ -270,41 +270,43 @@ const Signup = () => {
         <div className="signup-container">
             <h1 className="page-title">Sign Up</h1>
             <div className="signup-content">
-                <Form onSubmit={handleSubmit} className="signup-form" layout='vertical'>
+                <Form onFinish={handleSubmit} className="signup-form" layout='vertical'>
                     {/* help is used to set the message for validation, validateStatus is used to set validate status */}
                     <FormItem label="Full Name" validateStatus={userInfo.name.validateStatus}
                               help={userInfo.name.errorMsg}>
-                        <Input size="large"
+                        <Input prefix={<QuestionCircleOutlined/>}
+                               size="large"
                                name="name"
                                autoComplete="off"
-                               placeholder="Please type your full name"
                                value={userInfo.name.value}
                                onBlur={validateUsernameAvailability}
                                onChange={(event) => handleInputChange(event, validateName)}/>
                     </FormItem>
                     <FormItem label="Username" validateStatus={userInfo.username.validateStatus}
                               help={userInfo.username.errorMsg}>
-                        <Input size="large"
+                        <Input prefix={<QuestionCircleOutlined/>}
+                               size="large"
                                name="username"
                                autoComplete="off"
-                               placeholder="A unique username"
                                value={userInfo.username.value}
+                               onBlur={validateUsernameAvailability}
                                onChange={(event) => handleInputChange(event, validateUsername)}/>
                     </FormItem>
                     <FormItem label="Email" validateStatus={userInfo.email.validateStatus}
                               help={userInfo.email.errorMsg}>
-                        <Input size="large"
+                        <Input prefix={<MailOutlined/>}
+                               size="large"
                                name="email"
                                type="email"
                                autoComplete="off"
-                               placeholder="Your Email"
                                value={userInfo.email.value}
                                onBlur={validateEmailAvailability}
                                onChange={(event) => handleInputChange(event, validateEmail)}/>
                     </FormItem>
                     <FormItem label="Password" validateStatus={userInfo.password.validateStatus}
                               help={userInfo.password.errorMsg}>
-                        <Input size="large"
+                        <Input prefix={<LockOutlined/>}
+                               size="large"
                                name="password"
                                type="password"
                                autoComplete="off"
@@ -314,13 +316,12 @@ const Signup = () => {
                     </FormItem>
                     <FormItem>
                         <Button type="primary"
-                                shape="round"
                                 htmlType="submit"
                                 size="large"
                                 className="signup-form-button"
                                 disabled={isFormInvalid()}>Sign up</Button>
-                        Already registed?
-                        {/*<Link to="/login">Login now!</Link>*/}
+                        Already Registered?
+                        <Link to="/login"> Login Now!</Link>
                     </FormItem>
                 </Form>
             </div>

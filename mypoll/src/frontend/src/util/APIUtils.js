@@ -55,3 +55,53 @@ export const getCurrentUser = () => {
 
     return request(config)
 }
+
+export const createPoll = (pollData) => {
+    config.method = 'post'
+    config.url = API_BASE_URL + "/polls"
+    config.data = JSON.stringify(pollData)
+
+    return request(config)
+}
+
+export const getUserCreatedPolls = (username, page, size) => {
+    page = page || 0
+    size = size || POLL_LIST_SIZE
+    config.method = 'get'
+    config.url = API_BASE_URL + "/users/" + username + "/polls?page=" + page + "&size=" + size
+
+    return request(config)
+}
+
+export const getUserVotedPolls = (username, page, size) => {
+    page = page || 0
+    size = size || POLL_LIST_SIZE
+    config.method = 'get'
+    config.url = API_BASE_URL + "/users/" + username + "/votes?page=" + page + "&size=" + size
+
+    return request(config)
+}
+
+export const getUserProfile = (username) => {
+    config.method = 'get'
+    config.url = API_BASE_URL + "/users/" + username
+
+    return request(config)
+}
+
+export const getAllPolls = (page, size) => {
+    page = page || 0
+    size = size || POLL_LIST_SIZE
+    config.method = 'get'
+    config.url = API_BASE_URL + "/polls?pages=" + page + "&size=" + size
+
+    return request(config)
+}
+
+export const castVote = (voteData) => {
+    config.method = 'post'
+    config.url = API_BASE_URL + "/polls/" + voteData.pollId + "/votes"
+    config.data = JSON.stringify(voteData)
+
+    return request(config)
+}
